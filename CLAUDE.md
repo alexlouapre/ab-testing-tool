@@ -64,4 +64,3 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 | asu-2-tt | 2026-03-17 | A, B, C | asu-2-tt, asu-triton-classic, asu-triton-story | actif |
 | triton-meta | 2026-03-23 | A, B, C | asu-2, asu-triton-meta-verb, asu-triton-meta-story | actif |
 | rtg-mini | 2026-03-31 | A, B | rtg-1, rtg-2 | actif |
-| discount-test | 2026-04-20 | A, B | asu-2, asu-2-nd | actif |

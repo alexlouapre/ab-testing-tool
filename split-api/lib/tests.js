@@ -19,10 +19,4 @@ export const TESTS = {
       { id: "B", url: "https://info.poppins.io/rtg-2" },
     ],
   },
-  "discount-test": {
-    variants: [
-      { id: "A", url: "https://info.poppins.io/asu-2" },
-      { id: "B", url: "https://info.poppins.io/asu-2-nd" },
-    ],
-  },
 };

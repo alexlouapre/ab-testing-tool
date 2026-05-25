@@ -41,6 +41,18 @@ Utiliser `/deploy-split-test` — la skill pose les questions et modifie automat
 2. `split-api/dashboard.html` — ajouter dans l'objet TESTS JS
 3. Ce fichier — mettre à jour la table des tests actifs
 
+### Git auto-commit après déploiement d'un test
+
+Après chaque déploiement réussi d'un nouveau test (via `/deploy-split-test` ou modification manuelle de `lib/tests.js` + `dashboard.html` + table des tests actifs), exécuter automatiquement, sans demander confirmation :
+
+```bash
+git add -A
+git commit -m "Deploy split test: <test-id> (<variants>)"
+git push
+```
+
+Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `Deploy split test: rtg-mini (A, B)`). Si le déploiement modifie un test existant (kill switch, forced variant, ajout de variante), adapter le verbe : `Update split test: <test-id> — <change>`.
+
 ### URL Vercel par défaut
 
 `split-api-one.vercel.app`

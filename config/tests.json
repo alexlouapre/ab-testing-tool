@@ -1,0 +1,18 @@
+{
+  "asu-2": {
+    "enabled": true,
+    "variants": [
+      { "id": "A", "url": "https://info.poppins.io/asu-2" },
+      { "id": "B", "url": "https://info.poppins.io/asu-triton-classic" },
+      { "id": "C", "url": "https://info.poppins.io/asu-triton-story" }
+    ]
+  },
+  "asu-2-test-api": {
+    "enabled": true,
+    "variants": [
+      { "id": "A", "url": "https://info.poppins.io/asu-2-test-api" },
+      { "id": "B", "url": "https://info.poppins.io/asu-triton-classic" },
+      { "id": "C", "url": "https://info.poppins.io/asu-triton-story" }
+    ]
+  }
+}

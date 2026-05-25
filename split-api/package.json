@@ -1,0 +1,10 @@
+{
+  "name": "split-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@upstash/redis": "^1.37.0",
+    "puppeteer": "^24.39.1"
+  }
+}

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AB Test Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      color: #f0f0f0;
+    }
+
+    .card {
+      background: #0a0a0a;
+      border-radius: 16px;
+      border: 1px solid #1a1a1a;
+      padding: 32px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    select, input[type="date"] {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      color: #999;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:hover, input[type="date"]:hover { border-color: #333; }
+
+    select option {
+      background: #111;
+      color: #999;
+    }
+
+    .date-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .date-filter label {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .date-filter button {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #ccc;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .date-filter button:hover {
+      background: #252525;
+      border-color: #444;
+    }
+
+    .date-filter button.active {
+      background: #222;
+      border-color: #4facfe;
+      color: #4facfe;
+    }
+
+    .updated {
+      font-size: 0.75rem;
+      color: #444;
+    }
+
+    .total {
+      font-size: 1rem;
+      color: #666;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #141414;
+    }
+
+    .total strong {
+      font-size: 1.3rem;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .variants {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .variant-card {
+      flex: 1;
+      min-width: 140px;
+      background: #111;
+      border-radius: 12px;
+      padding: 20px;
+      border-top: 3px solid;
+      text-align: center;
+      transition: background 0.2s;
+    }
+
+    .variant-card:hover {
+      background: #151515;
+    }
+
+    .variant-card .label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .variant-card .count {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    .variant-card .percent {
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    .variant-card .cta-divider {
+      border-top: 1px solid #1a1a1a;
+      margin: 14px 0 10px;
+    }
+
+    .variant-card .cta-count {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .variant-card .cta-conv {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    .variant-card .url {
+      font-size: 0.65rem;
+      color: #333;
+      margin-top: 12px;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    .variant-card .url a {
+      color: #444;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .variant-card .url a:hover {
+      color: #888;
+    }
+
+    .chart-section {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #141414;
+    }
+
+    .chart-section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 280px;
+      margin-bottom: 24px;
+    }
+
+    .daily-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .daily-table th, .daily-table td {
+      padding: 8px 12px;
+      text-align: center;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .daily-table th {
+      color: #666;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .daily-table td {
+      color: #ccc;
+    }
+
+    .daily-table tr:hover td {
+      background: #111;
+    }
+
+    .error-overlay {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .error-overlay .icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .error-overlay .msg {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 500px) {
+      .variants { flex-direction: column; }
+      .variant-card { min-width: unset; }
+      body { padding: 20px 12px; }
+      .card { padding: 20px; }
+      .daily-table { font-size: 0.75rem; }
+      .daily-table th, .daily-table td { padding: 6px 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="error" class="error-overlay hidden">
+      <div class="icon">&#128274;</div>
+      <div class="msg" id="error-msg"></div>
+    </div>
+
+    <div id="content">
+      <div class="header">
+        <h1>AB Test Tracker</h1>
+        <div class="header-right">
+          <select id="test-select"></select>
+          <span class="updated" id="updated"></span>
+        </div>
+      </div>
+
+      <div class="date-filter">
+        <label>Du</label>
+        <input type="date" id="date-from">
+        <label>au</label>
+        <input type="date" id="date-to">
+        <button id="btn-filter">Filtrer</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+
+      <div class="total">
+        Total visiteurs : <strong id="total">—</strong>
+      </div>
+
+      <div class="variants" id="variants"></div>
+
+      <div id="daily-section" class="chart-section hidden">
+        <h2>Visits par jour</h2>
+        <div class="chart-container">
+          <canvas id="chart-visits"></canvas>
+        </div>
+        <h2>Taux de conversion par jour</h2>
+        <div class="chart-container">
+          <canvas id="chart-conv"></canvas>
+        </div>
+        <h2>Détail par jour</h2>
+        <table class="daily-table" id="daily-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TESTS = {
+      "triton-meta": {
+        label: "Triton Meta",
+        variants: {
+          A: { color: "#4facfe", url: "https://info.poppins.io/asu-2" },
+          B: { color: "#43e97b", url: "https://info.poppins.io/asu-triton-meta-verb" },
+          C: { color: "#fa709a", url: "https://info.poppins.io/asu-triton-meta-story" }
+        }
+      },
+      "asu-2-tt": {
+        label: "ASU-2 TT",
+        variants: {
+          A: { color: "#4facfe", url: "https://info.poppins.io/asu-2-tt" },
+          B: { color: "#43e97b", url: "https://info.poppins.io/asu-triton-classic" },
+          C: { color: "#fa709a", url: "https://info.poppins.io/asu-triton-story" }
+        }
+      },
+      "rtg-mini": {
+        label: "RTG Mini",
+        variants: {
+          A: { color: "#4facfe", url: "https://info.poppins.io/rtg-1" },
+          B: { color: "#43e97b", url: "https://info.poppins.io/rtg-2" }
+        }
+      },
+      "discount-test": {
+        label: "Discount-20%",
+        variants: {
+          A: { color: "#4facfe", url: "https://info.poppins.io/asu-2" },
+          B: { color: "#43e97b", url: "https://info.poppins.io/asu-2-nd" }
+        }
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    const errorEl = document.getElementById("error");
+    const errorMsg = document.getElementById("error-msg");
+    const contentEl = document.getElementById("content");
+    const selectEl = document.getElementById("test-select");
+    const updatedEl = document.getElementById("updated");
+    const totalEl = document.getElementById("total");
+    const variantsEl = document.getElementById("variants");
+    const dateFromEl = document.getElementById("date-from");
+    const dateToEl = document.getElementById("date-to");
+    const btnFilter = document.getElementById("btn-filter");
+    const btnReset = document.getElementById("btn-reset");
+    const dailySection = document.getElementById("daily-section");
+
+    let chartVisits = null;
+    let chartConv = null;
+    let dateFilterActive = false;
+
+    function showError(msg) {
+      errorEl.classList.remove("hidden");
+      contentEl.classList.add("hidden");
+      errorMsg.textContent = msg;
+    }
+
+    function showContent() {
+      errorEl.classList.add("hidden");
+      contentEl.classList.remove("hidden");
+    }
+
+    if (!token) {
+      showError("Ajoutez ?token=xxx \u00e0 l\u2019URL");
+    } else {
+      Object.entries(TESTS).forEach(([id, test]) => {
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = test.label;
+        selectEl.appendChild(opt);
+      });
+
+      // Default dates: last 7 days
+      const today = new Date().toISOString().slice(0, 10);
+      dateToEl.value = today;
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 6);
+      dateFromEl.value = weekAgo.toISOString().slice(0, 10);
+
+      selectEl.addEventListener("change", fetchStats);
+      btnFilter.addEventListener("click", () => {
+        dateFilterActive = true;
+        btnFilter.classList.add("active");
+        fetchStats();
+      });
+      btnReset.addEventListener("click", () => {
+        dateFilterActive = false;
+        btnFilter.classList.remove("active");
+        dailySection.classList.add("hidden");
+        fetchStats();
+      });
+
+      fetchStats();
+      setInterval(fetchStats, 10000);
+    }
+
+    async function fetchStats() {
+      const testId = selectEl.value;
+      const test = TESTS[testId];
+      if (!test) return;
+
+      let url = `/api/stats?test=${testId}`;
+      if (dateFilterActive && dateFromEl.value && dateToEl.value) {
+        url += `&from=${dateFromEl.value}&to=${dateToEl.value}`;
+      }
+
+      try {
+        const res = await fetch(url, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+          showError("Token invalide");
+          return;
+        }
+
+        if (!res.ok) {
+          showError("Erreur de connexion");
+          return;
+        }
+
+        const data = await res.json();
+        showContent();
+
+        totalEl.textContent = data.total.toLocaleString("fr-FR");
+
+        variantsEl.innerHTML = "";
+        const ctaEvents = data.events && data.events.clic_main_cta || {};
+        Object.entries(test.variants).forEach(([key, cfg]) => {
+          const count = data[key] || 0;
+          const pct = data.total > 0 ? ((count / data.total) * 100).toFixed(1) : "0.0";
+          const ctaCount = ctaEvents[key] || 0;
+          const convRate = count > 0 ? ((ctaCount / count) * 100).toFixed(1) : "0.0";
+
+          const div = document.createElement("div");
+          div.className = "variant-card";
+          div.style.borderTopColor = cfg.color;
+          div.innerHTML = `
+            <div class="label" style="color:${cfg.color}">Variante ${key}</div>
+            <div class="count">${count.toLocaleString("fr-FR")}</div>
+            <div class="percent">${pct} %</div>
+            <div class="cta-divider"></div>
+            <div class="cta-count">Click main_cta : ${ctaCount.toLocaleString("fr-FR")}</div>
+            <div class="cta-conv">conv : ${convRate} %</div>
+            <div class="url"><a href="${cfg.url}" target="_blank">${cfg.url.replace("https://", "")}</a></div>
+          `;
+          variantsEl.appendChild(div);
+        });
+
+        // Daily breakdown
+        if (data.daily) {
+          dailySection.classList.remove("hidden");
+          const days = Object.keys(data.daily).sort();
+          const variantKeys = Object.keys(test.variants);
+
+          renderCharts(days, variantKeys, test.variants, data.daily);
+          renderDailyTable(days, variantKeys, test.variants, data.daily);
+        } else {
+          dailySection.classList.add("hidden");
+        }
+
+        const now = new Date();
+        updatedEl.textContent = "Mis \u00e0 jour : " + now.toLocaleTimeString("fr-FR");
+      } catch (e) {
+        console.error("fetchStats error:", e);
+        showError("Erreur de connexion");
+      }
+    }
+
+    function renderCharts(days, variantKeys, variants, daily) {
+      const labels = days.map(d => d.slice(5)); // "03-19"
+
+      // Visits chart
+      const visitsDatasets = variantKeys.map(key => ({
+        label: `Variante ${key}`,
+        data: days.map(d => daily[d][key]?.visits || 0),
+        borderColor: variants[key].color,
+        backgroundColor: variants[key].color + "33",
+        tension: 0.3,
+        fill: false,
+        pointRadius: 4,
+      }));
+
+      if (chartVisits) chartVisits.destroy();
+      chartVisits = new Chart(document.getElementById("chart-visits"), {
+        type: "line",
+        data: { labels, datasets: visitsDatasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: "#888" } } },
+          scales: {
+            x: { ticks: { color: "#666" }, grid: { color: "#1a1a1a" } },
+            y: { beginAtZero: true, ticks: { color: "#666" }, grid: { color: "#1a1a1a" } },
+          },
+        },
+      });
+
+      // Conversion rate chart
+      const convDatasets = variantKeys.map(key => ({
+        label: `Variante ${key}`,
+        data: days.map(d => {
+          const v = daily[d][key];
+          if (!v || !v.visits) return 0;
+          return parseFloat(((v.clic_main_cta / v.visits) * 100).toFixed(1));
+        }),
+        borderColor: variants[key].color,
+        backgroundColor: variants[key].color + "33",
+        tension: 0.3,
+        fill: false,
+        pointRadius: 4,
+      }));
+
+      if (chartConv) chartConv.destroy();
+      chartConv = new Chart(document.getElementById("chart-conv"), {
+        type: "line",
+        data: { labels, datasets: convDatasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: "#888" } } },
+          scales: {
+            x: { ticks: { color: "#666" }, grid: { color: "#1a1a1a" } },
+            y: {
+              beginAtZero: true,
+              ticks: { color: "#666", callback: v => v + "%" },
+              grid: { color: "#1a1a1a" },
+            },
+          },
+        },
+      });
+    }
+
+    function renderDailyTable(days, variantKeys, variants, daily) {
+      const table = document.getElementById("daily-table");
+
+      let thead = `<thead><tr><th>Date</th>`;
+      variantKeys.forEach(key => {
+        thead += `<th style="color:${variants[key].color}">V.${key} visits</th>`;
+        thead += `<th style="color:${variants[key].color}">V.${key} CTA</th>`;
+        thead += `<th style="color:${variants[key].color}">V.${key} conv</th>`;
+      });
+      thead += `</tr></thead>`;
+
+      let tbody = `<tbody>`;
+      days.forEach(day => {
+        tbody += `<tr><td>${day}</td>`;
+        variantKeys.forEach(key => {
+          const v = daily[day][key] || { visits: 0, clic_main_cta: 0 };
+          const conv = v.visits > 0 ? ((v.clic_main_cta / v.visits) * 100).toFixed(1) : "0.0";
+          tbody += `<td>${v.visits}</td>`;
+          tbody += `<td>${v.clic_main_cta}</td>`;
+          tbody += `<td>${conv}%</td>`;
+        });
+        tbody += `</tr>`;
+      });
+      tbody += `</tbody>`;
+
+      table.innerHTML = thead + tbody;
+    }
+  </script>
+</body>
+</html>

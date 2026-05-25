@@ -4,6 +4,15 @@
 
 API serverless Vercel (`split-api/`) avec Upstash Redis pour le round-robin et le tracking.
 
+### ⚠️ Contrainte structurante — URL d'entrée des ads figée
+
+Les ads Meta pointent toutes vers une **URL d'entrée fixe** (actuellement `https://info.poppins.io/asu-2`). Cette URL **ne doit jamais être modifiée dans les ads** — un changement reset l'historique d'apprentissage de la campagne (audience, optimisation, perfs).
+
+Conséquences pour tout split URL :
+- Le snippet `split-redirect.js` se place dans le Custom Code Framer de **l'URL d'entrée** (asu-2 aujourd'hui). C'est elle qui décide où rediriger.
+- Quand on **stoppe un test**, on **ne change pas l'URL des ads ni l'URL du CTA des landings**. On retire juste le snippet `split-redirect` du Custom Code de la page d'entrée.
+- Si un test produit une "winner" et qu'on veut la passer à 100 % du trafic, la bonne stratégie n'est **PAS** de rediriger les ads vers une autre URL. C'est de **réécrire le contenu de l'URL d'entrée** pour qu'il corresponde à la winner. L'URL reste stable, le contenu change.
+
 ### Fichiers clés
 
 - `split-api/lib/tests.js` — source unique de l'objet `TESTS` (importé par tous les endpoints)
@@ -40,6 +49,22 @@ Utiliser `/deploy-split-test` — la skill pose les questions et modifie automat
 1. `split-api/lib/tests.js` — ajouter l'entrée dans TESTS
 2. `split-api/dashboard.html` — ajouter dans l'objet TESTS JS
 3. Ce fichier — mettre à jour la table des tests actifs
+
+### Stopper un test
+
+Procédure quand l'utilisateur demande de couper / arrêter un test :
+
+1. **Dump des stats finales** — `GET /api/stats?test=<id>` (auth Bearer `ADMIN_TOKEN` lu depuis `split-api/.env.local`). Inclure le tableau dans le message de commit pour archive.
+2. **Kill switch immédiat** — `POST /api/config?test=<id>` avec `{ "enabled": false }`. Tout visiteur qui hit encore `/api/assign` retombe sur `variants[0]` (cf. `assign.js` ligne 36).
+3. **Nettoyage du code** :
+   - retirer l'entrée du test dans `split-api/lib/tests.js`
+   - retirer le bloc du test dans `split-api/dashboard.html` (objet TESTS JS)
+   - retirer la ligne du test dans la table des tests actifs de ce fichier
+4. **Commit + push auto** (sans demander confirmation), format `Stop split test: <test-id> (winner: <variant> kept, <other> retired)` + stats finales dans le body.
+
+⚠️ **Côté Framer** — informer l'utilisateur qu'il doit retirer le snippet `split-redirect` du discount-test (ou autre) dans le Custom Code de la page d'entrée des ads. **Ne PAS lui demander de changer l'URL des ads ni l'URL du CTA des landings** (cf. contrainte URL d'entrée figée).
+
+⚠️ **Override CTA — ne rien toucher** — l'override `override-cta.tsx` est universel et tolérant. Les vieux cookies `split_<test-retiré>` qui traînent (TTL 30 jours, cf. `split-redirect-template.js` ligne 20) génèrent des requêtes `/api/track` qui répondent `400 Unknown test`. Inoffensif, juste un peu de bruit dans les logs Vercel le temps de l'expiration.
 
 ### Git auto-commit après déploiement d'un test
 

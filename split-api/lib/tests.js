@@ -19,4 +19,11 @@ export const TESTS = {
       { id: "B", url: "https://info.poppins.io/rtg-2" },
     ],
   },
+  "quickfix-asu-2": {
+    variants: [
+      { id: "A", url: "https://info.poppins.io/asu-2" },
+      { id: "B", url: "https://info.poppins.io/asu-2-qf-b" },
+      { id: "C", url: "https://info.poppins.io/asu-2-qf-c" },
+    ],
+  },
 };

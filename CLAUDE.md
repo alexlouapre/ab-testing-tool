@@ -66,9 +66,11 @@ Procédure quand l'utilisateur demande de couper / arrêter un test :
 
 ⚠️ **Override CTA — ne rien toucher** — l'override `override-cta.tsx` est universel et tolérant. Les vieux cookies `split_<test-retiré>` qui traînent (TTL 30 jours, cf. `split-redirect-template.js` ligne 20) génèrent des requêtes `/api/track` qui répondent `400 Unknown test`. Inoffensif, juste un peu de bruit dans les logs Vercel le temps de l'expiration.
 
-### Git auto-commit après déploiement d'un test
+### Déploiement = `git push` (auto-deploy GitHub→Vercel)
 
-Après chaque déploiement réussi d'un nouveau test (via `/deploy-split-test` ou modification manuelle de `lib/tests.js` + `dashboard.html` + table des tests actifs), exécuter automatiquement, sans demander confirmation :
+⚠️ **Le déploiement se fait par `git push` sur `main`, PAS par `vercel --prod`.** Le repo `alexlouapre/ab-testing-tool` est connecté en auto-deploy au projet Vercel `split-api` (Settings → Git, Root Directory = `split-api`). Tout push sur `main` déclenche un build **côté serveurs Vercel** (~8s), indépendant de la connexion locale. C'est donc le `git push` qui met le code en prod, pas seulement une archive.
+
+Après chaque déploiement d'un nouveau test (via `/deploy-split-test` ou modif manuelle de `lib/tests.js` + `dashboard.html` + table des tests actifs), exécuter automatiquement, sans demander confirmation :
 
 ```bash
 git add -A
@@ -77,6 +79,14 @@ git push
 ```
 
 Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `Deploy split test: rtg-mini (A, B)`). Si le déploiement modifie un test existant (kill switch, forced variant, ajout de variante), adapter le verbe : `Update split test: <test-id> — <change>`.
+
+⚠️ **Ne PAS utiliser `vercel --prod`** : depuis une connexion instable, la CLI n'arrive pas à joindre `api.vercel.com` et le déploiement reste coincé en statut **`UNKNOWN`** (build `[0ms]`, jamais exécuté), sans remplacer la prod. C'est exactement ce qui est arrivé à `quickfix-asu-2` le 29/05 (resté non-live 3 jours alors que le code était bon).
+
+**Re-trigger d'un build bloqué / vérif post-deploy** :
+- Pour relancer un build coincé : `git commit --allow-empty -m "chore: trigger deploy" && git push`.
+- Nettoyer les déploiements UNKNOWN : `vercel remove <deployment-url> --yes` (ne jamais toucher le `● Ready` qui porte l'alias).
+- Vérifs : `GET /api/assign?test=<id>` (200 + variante), `GET /api/stats?test=<id>` (Bearer ADMIN_TOKEN), `/dashboard` (grep test id), `vercel ls --prod` (top = `● Ready`).
+- ⚠️ Le proxy RTK casse `curl` (`FAILED: curl`) → utiliser **`/usr/bin/curl`** pour les vérifs HTTP.
 
 ### URL Vercel par défaut
 

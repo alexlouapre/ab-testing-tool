@@ -29,6 +29,8 @@ Conséquences pour tout split URL :
 
 **Override CTA** : un seul fichier `split-api/scripts/override-cta.tsx` pour TOUS les boutons CTA de toutes les pages et tous les tests. Il scanne les cookies `split_*` et derive automatiquement le test ID par convention (`split_` prefix + `_` → `-`). Aucune modification necessaire lors de l'ajout d'un nouveau test.
 
+⚠️ **Dualité de nommage repo ↔ Framer** : dans le repo, le fichier s'appelle `override-cta.tsx` et la fonction exportée `PushDataLayerEvent`. Dans le projet Framer Poppins, le fichier équivalent dans les Code Overrides s'appelle **`Split_CTA_Tracker`** (visible dans le menu "File" du panneau Code Overrides). Quand on guide l'utilisateur côté Framer, dire **`Split_CTA_Tracker`**, pas `override-cta`.
+
 ⚠️ **Subtilité Framer** : l'override `onClick` retourné par une fonction Override ne fire pas sur les composants Link/boutons Framer (la navigation native prend le dessus). La solution est d'utiliser `useEffect` (importé depuis `"react"`, pas `"framer"`) pour attacher un event listener natif sur `document` en capture phase (`capture: true`). Cela intercepte le clic avant la navigation.
 
 **Redirect** : chaque test a son `split-redirect.js` avec un bloc `SPLIT_CONFIG` (test ID, cookie name, variants URLs) suivi de la logique generique. Pour creer un nouveau redirect, copier le template `split-api/scripts/split-redirect-template.js` et modifier uniquement `SPLIT_CONFIG`.
@@ -49,6 +51,12 @@ Utiliser `/deploy-split-test` — la skill pose les questions et modifie automat
 1. `split-api/lib/tests.js` — ajouter l'entrée dans TESTS
 2. `split-api/dashboard.html` — ajouter dans l'objet TESTS JS
 3. Ce fichier — mettre à jour la table des tests actifs
+
+⚠️ **Attribution par LP — paramètre `?landing=<slug>` hardcodé dans l'URL du bouton CTA** : le snippet redirect ne propage PAS de paramètre `landing` automatiquement. C'est l'**URL du CTA elle-même** qui doit contenir `?landing=<slug>` côté Framer, à coder manuellement page par page (ex: sur `asu-2-qf-b`, le bouton CTA pointe vers `https://www.poppins.io/eligibilite-v5b?landing=asu-2-qf-b`). Ce param sert ensuite à dispatcher les soumissions Typeform par bras dans les scripts d'analyse. À rappeler à l'utilisateur lors de l'étape Framer.
+
+⚠️ **Custom Code Framer = espace de publication séparé** (depuis ~mai 2026) : Framer a séparé la publication du Custom Code du Publish principal du site. Un Save dans l'éditeur Custom Code n'envoie PAS le snippet sur le site live — il faut aussi cliquer le bouton **Publish global du site** (en haut à droite). Symptôme typique d'oubli : `curl https://info.poppins.io/asu-2 | grep SPLIT_CONFIG` ne renvoie rien alors que le Custom Code est "saved". À vérifier en premier si le snippet ne semble pas déployé côté Framer.
+
+⚠️ **Déploiement Vercel = compte Alex Louapre** : le projet Vercel `split-api` est sur le compte d'Alex. Le push GitHub déclenche normalement un auto-deploy via webhook, mais si l'API live ne reflète pas le nouveau test (`{"error":"unknown test"}`), seul Alex peut vérifier/relancer le deploy. Ping Alex avec le hash du commit. Test rapide pour confirmer que c'est bien un problème de deploy (pas de code) : `curl https://split-api-one.vercel.app/api/assign?test=<un-test-déjà-actif>` — si réponse normale + le nouveau test inconnu, c'est le deploy.
 
 ### Stopper un test
 

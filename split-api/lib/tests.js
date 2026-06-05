@@ -28,7 +28,7 @@ export const TESTS = {
   },
   "sp-26": {
     variants: [
-      { id: "A", url: "https://info.poppins.io/sp-26-eli" },
+      { id: "A", url: "https://info.poppins.io/sp-26" },
       { id: "B", url: "https://info.poppins.io/sp-26-dir" },
     ],
   },

@@ -108,4 +108,4 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 | triton-meta | 2026-03-23 | A, B, C | asu-2, asu-triton-meta-verb, asu-triton-meta-story | actif |
 | rtg-mini | 2026-03-31 | A, B | rtg-1, rtg-2 | actif |
 | quickfix-asu-2 | 2026-05-29 | A, B, C | asu-2, asu-2-qf-b, asu-2-qf-c | actif |
-| sp-26 | 2026-06-04 | A, B | sp-26-eli, sp-26-dir | actif |
+| sp-26 | 2026-06-04 | A, B | sp-26, sp-26-dir | actif |

@@ -26,10 +26,4 @@ export const TESTS = {
       { id: "C", url: "https://info.poppins.io/asu-2-qf-c" },
     ],
   },
-  "sp-26": {
-    variants: [
-      { id: "A", url: "https://info.poppins.io/sp-26" },
-      { id: "B", url: "https://info.poppins.io/sp-26-dir" },
-    ],
-  },
 };

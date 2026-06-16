@@ -65,8 +65,8 @@ Procédure quand l'utilisateur demande de couper / arrêter un test :
 1. **Dump des stats finales** — `GET /api/stats?test=<id>` (auth Bearer `ADMIN_TOKEN` lu depuis `split-api/.env.local`). Inclure le tableau dans le message de commit pour archive.
 2. **Kill switch immédiat** — `POST /api/config?test=<id>` avec `{ "enabled": false }`. Tout visiteur qui hit encore `/api/assign` retombe sur `variants[0]` (cf. `assign.js` ligne 36).
 3. **Nettoyage du code** :
-   - retirer l'entrée du test dans `split-api/lib/tests.js`
-   - ⚠️ **NE PAS retirer** le bloc du test dans `split-api/dashboard.html` — garder les anciens tests pour consultation historique des stats
+   - ⚠️ **NE PAS retirer** l'entrée du test dans `split-api/lib/tests.js` — requis pour que `/api/stats` puisse encore lire les données Redis
+   - ⚠️ **NE PAS retirer** le bloc du test dans `split-api/dashboard.html` — garder les anciens tests pour consultation historique
    - retirer la ligne du test dans la table des tests actifs de ce fichier
 4. **Commit + push auto** (sans demander confirmation), format `Stop split test: <test-id> (winner: <variant> kept, <other> retired)` + stats finales dans le body.
 

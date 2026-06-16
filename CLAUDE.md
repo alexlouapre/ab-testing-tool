@@ -66,7 +66,7 @@ Procédure quand l'utilisateur demande de couper / arrêter un test :
 2. **Kill switch immédiat** — `POST /api/config?test=<id>` avec `{ "enabled": false }`. Tout visiteur qui hit encore `/api/assign` retombe sur `variants[0]` (cf. `assign.js` ligne 36).
 3. **Nettoyage du code** :
    - retirer l'entrée du test dans `split-api/lib/tests.js`
-   - retirer le bloc du test dans `split-api/dashboard.html` (objet TESTS JS)
+   - ⚠️ **NE PAS retirer** le bloc du test dans `split-api/dashboard.html` — garder les anciens tests pour consultation historique des stats
    - retirer la ligne du test dans la table des tests actifs de ce fichier
 4. **Commit + push auto** (sans demander confirmation), format `Stop split test: <test-id> (winner: <variant> kept, <other> retired)` + stats finales dans le body.
 
@@ -105,5 +105,4 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 | Test ID | Date | Variantes | URLs | Statut |
 |---------|------|-----------|------|--------|
 | asu-2-tt | 2026-03-17 | A, B, C | asu-2-tt, asu-triton-classic, asu-triton-story | actif |
-| triton-meta | 2026-03-23 | A, B, C | asu-2, asu-triton-meta-verb, asu-triton-meta-story | actif |
 | rtg-mini | 2026-03-31 | A, B | rtg-1, rtg-2 | actif |

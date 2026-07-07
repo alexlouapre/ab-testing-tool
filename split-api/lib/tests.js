@@ -26,4 +26,10 @@ export const TESTS = {
       { id: "C", url: "https://info.poppins.io/asu-2-qf-c" },
     ],
   },
+  "ptf-perso": {
+    variants: [
+      { id: "A", url: "https://info.poppins.io/asu-2-ptf-a" },
+      { id: "B", url: "https://info.poppins.io/asu-2-ptf-b" },
+    ],
+  },
 };

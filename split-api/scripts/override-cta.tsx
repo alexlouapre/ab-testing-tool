@@ -33,7 +33,7 @@ function sendSplitBeacons() {
 }
 
 const CTA_PATH_RE =
-    /poppins\.io\/(compatibilite|eligibilite)(-[a-z0-9]+)?(\?|\/|$)/i
+    /poppins\.io\/(compatibilite|eligibilite)(-[a-z0-9]+)*(\?|\/|$)/i
 
 export function PushDataLayerEvent(): Override {
     useEffect(() => {

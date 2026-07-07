@@ -28,8 +28,8 @@ export const TESTS = {
   },
   "ptf-perso": {
     variants: [
-      { id: "A", url: "https://info.poppins.io/asu-2-ptf-a" },
-      { id: "B", url: "https://info.poppins.io/asu-2-ptf-b" },
+      { id: "A", url: "https://info.poppins.io/asu-2-ptf-a", weight: 80 },
+      { id: "B", url: "https://info.poppins.io/asu-2-ptf-b", weight: 20 },
     ],
   },
 };

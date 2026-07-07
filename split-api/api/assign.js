@@ -55,10 +55,10 @@ export default async function handler(req, res) {
       }
     }
 
-    // Atomic round-robin counter
+    // Atomic round-robin counter (weighted if variants have a `weight` field)
+    const slots = test.variants.flatMap(v => Array(v.weight || 1).fill(v));
     const counter = await redis.incr(`counter:${testId}`);
-    const index = (counter - 1) % test.variants.length;
-    const variant = test.variants[index];
+    const variant = slots[(counter - 1) % slots.length];
 
     // Increment per-variant stats (global + daily)
     try {

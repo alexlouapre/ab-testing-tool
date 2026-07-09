@@ -106,4 +106,4 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 |---------|------|-----------|------|--------|
 | asu-2-tt | 2026-03-17 | A, B, C | asu-2-tt, asu-triton-classic, asu-triton-story | actif |
 | rtg-mini | 2026-03-31 | A, B | rtg-1, rtg-2 | actif |
-| ptf-perso | 2026-07-07 17h45 (restart, fix tracking CTA bras B) | A, B | asu-2-ptf-a, asu-2-ptf-b | actif |
+| ptf-perso | 2026-07-08 (officiel, 50/50 ; lancé 07-07 mais exclu — pas encore 50/50) | A, B | asu-2-ptf-a, asu-2-ptf-b | actif |

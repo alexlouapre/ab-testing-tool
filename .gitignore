@@ -15,3 +15,6 @@ node_modules/
 # Logs
 *.log
 npm-debug.log*
+
+# Local exports / backups
+ab_assigns_historique.csv

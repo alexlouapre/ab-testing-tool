@@ -119,6 +119,8 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 
 ## Tests actifs
 
-| Test ID | Date | Variantes | URLs | Statut |
-|---------|------|-----------|------|--------|
-| asu-2-tt | 2026-03-17 | A, B, C | asu-2-tt, asu-triton-classic, asu-triton-story | actif |
+**Aucun test actif** (depuis le 2026-08-31).
+
+L'URL d'entree des ads `https://info.poppins.io/asu-2` sert desormais directement le contenu de la winner de `ptf-perso` (bras B : CTA vers `eligibilite-v5b-ptf`), sans snippet de redirect. Voir la section "Passer une winner a 100 % (bascule propre)".
+
+Historique des tests : entrees conservees dans `split-api/lib/tests.js` et `split-api/dashboard.html`, stats lisibles via `GET /api/stats?test=<id>`, snippets archives dans `split-api/scripts/`.

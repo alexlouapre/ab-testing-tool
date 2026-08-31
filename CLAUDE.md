@@ -63,7 +63,7 @@ Utiliser `/deploy-split-test` — la skill pose les questions et modifie automat
 Procédure quand l'utilisateur demande de couper / arrêter un test :
 
 1. **Dump des stats finales** — `GET /api/stats?test=<id>` (auth Bearer `ADMIN_TOKEN` lu depuis `split-api/.env.local`). Inclure le tableau dans le message de commit pour archive.
-2. **Kill switch immédiat** — `POST /api/config?test=<id>` avec `{ "enabled": false }`. Tout visiteur qui hit encore `/api/assign` retombe sur `variants[0]` (cf. `assign.js` ligne 36).
+2. **Épingler la winner, pas le kill switch** : `POST /api/config?test=<id>` avec `{ "enabled": true, "forcedVariant": "<winner>" }`. ⚠️ **Ne PAS utiliser `{ "enabled": false }` sauf si la winner est `variants[0]`** : `enabled: false` renvoie tout appel restant sur `variants[0]` (cf. `assign.js` ligne 36), c'est-à-dire sur A. Si la winner est B ou C, le kill switch enverrait le trafic résiduel sur la **perdante**. `forcedVariant` est fail-safe dans le bon sens.
 3. **Nettoyage du code** :
    - ⚠️ **NE PAS retirer** l'entrée du test dans `split-api/lib/tests.js` — requis pour que `/api/stats` puisse encore lire les données Redis
    - ⚠️ **NE PAS retirer** le bloc du test dans `split-api/dashboard.html` — garder les anciens tests pour consultation historique
@@ -73,6 +73,23 @@ Procédure quand l'utilisateur demande de couper / arrêter un test :
 ⚠️ **Côté Framer** — informer l'utilisateur qu'il doit retirer le snippet `split-redirect` du discount-test (ou autre) dans le Custom Code de la page d'entrée des ads. **Ne PAS lui demander de changer l'URL des ads ni l'URL du CTA des landings** (cf. contrainte URL d'entrée figée).
 
 ⚠️ **Override CTA — ne rien toucher** — l'override `override-cta.tsx` est universel et tolérant. Les vieux cookies `split_<test-retiré>` qui traînent (TTL 30 jours, cf. `split-redirect-template.js` ligne 20) génèrent des requêtes `/api/track` qui répondent `400 Unknown test`. Inoffensif, juste un peu de bruit dans les logs Vercel le temps de l'expiration.
+
+### Passer une winner à 100 % (bascule propre)
+
+Séquence validée le 2026-08-31 sur `ptf-perso` (winner B). **L'ordre est critique** : couper le test en premier enverrait le trafic sur `variants[0]`, donc sur A.
+
+1. **Le contenu d'abord** : porter le contenu de la winner sur l'URL d'entrée des ads (ex: `asu-2`). Confortable, car tant que le snippet est actif l'URL d'entrée est **invisible** (le snippet masque le body en `opacity: 0` puis redirige) : on peut la reconstruire et republier en live sans impacter un seul visiteur.
+2. **CTA avec un slug neuf** : `?landing=<slug-de-l-URL-d-entree>` hardcodé dans l'URL du bouton, et **pas** le slug de la variante gagnante. Sinon le trafic post-test se mélange aux soumissions Typeform de la période de test et les chiffres du test ne sont plus relisibles. Penser à ajouter ce slug aux scripts d'analyse (`PROJET_ANALYSE_TYPEFORM_ELIGIBILITY`), sinon le trafic devient invisible dans les analyses.
+3. **Désactiver le snippet** : passer l'entrée Custom Code du test en **DISABLED** (convention maison : on désactive, on ne supprime pas), puis **Publish global du site**. Vérif : `/usr/bin/curl -s https://info.poppins.io/<entree> | grep -oE 'SPLIT_CONFIG|GTM-T59MRZ6B'` ne doit plus renvoyer `SPLIT_CONFIG` mais doit **toujours** renvoyer le GTM.
+4. **Clôture API** : épingler la winner (cf. étape 2 de "Stopper un test"), commit, push.
+
+⚠️ **Le Custom Code Framer est une liste d'entrées séparées, chacune avec son toggle** (Site Settings → Code), scopées par page. Le GTM vit dans une entrée `GTM + UTM + VWO` (Start of `<head>`, page **All**) distincte des snippets de split : désactiver un split ne touche donc pas au tracking. Ne jamais couper une entrée `All` pour arrêter un test.
+
+⚠️ **Archiver le snippet avant de le désactiver** : celui de `ptf-perso` n'avait jamais été commité, il ne vivait que dans le Custom Code Framer. Vérifier qu'un `split-api/scripts/split-redirect-<test>.js` existe, sinon le récupérer depuis le live avant toute désactivation.
+
+⚠️ **Discontinuité analytics après la bascule** : avant, l'URL d'entrée encaissait tous les pageviews mais redirigeait instantanément, et la page de la variante portait la vraie session. Après, c'est l'inverse : l'URL d'entrée porte la session et la page de la variante **tombe à zéro**. Tout dashboard GTM/GA/Metabase indexé sur le chemin de la variante s'effondre d'un coup. Prévenir qui les lit et les repointer.
+
+⚠️ **Les stats archivées continuent de dériver** après la bascule : les cookies `split_<test>` résiduels (TTL 30 jours) font encore tourner l'override CTA, qui appelle `/api/track`, incrémenté sans déduplication. Les chiffres à retenir sont ceux dumpés au moment de la bascule (archivés dans le message de commit).
 
 ### Déploiement = `git push` (auto-deploy GitHub→Vercel)
 
@@ -105,4 +122,3 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 | Test ID | Date | Variantes | URLs | Statut |
 |---------|------|-----------|------|--------|
 | asu-2-tt | 2026-03-17 | A, B, C | asu-2-tt, asu-triton-classic, asu-triton-story | actif |
-| ptf-perso | 2026-07-08 (officiel, 50/50 ; lancé 07-07 mais exclu — pas encore 50/50) | A, B | asu-2-ptf-a, asu-2-ptf-b | actif |

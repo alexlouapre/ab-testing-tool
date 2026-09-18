@@ -29,6 +29,23 @@ Conséquences pour tout split URL :
 
 **Override CTA** : un seul fichier `split-api/scripts/override-cta.tsx` pour TOUS les boutons CTA de toutes les pages et tous les tests. Il scanne les cookies `split_*` et derive automatiquement le test ID par convention (`split_` prefix + `_` → `-`). Aucune modification necessaire lors de l'ajout d'un nouveau test.
 
+⚠️ **Deux motifs de detection depuis le 18/09/2026, a ne pas confondre.** Le fichier teste desormais chaque lien contre deux regex :
+
+| Regex | Ce qu'elle gouverne | Perimetre |
+|---|---|---|
+| `CTA_PATH_RE` | le push `dataLayer` | liens vers `poppins.io/(compatibilite\|eligibilite)` |
+| `SPLIT_CTA_RE` | le beacon de split et le delai de navigation de 150 ms | idem, **plus** les liens vers une page dont le slug finit par `-offres` |
+
+`CTA_PATH_RE` est un sous-ensemble strict de `SPLIT_CTA_RE`, donc le comportement des liens deja couverts avant cette date est inchange.
+
+**Pourquoi separer.** Elargir `CTA_PATH_RE` aurait elargi le push `dataLayer`, donc les tags GTM qui l'ecoutent : le tag 244 (event GA4 `clic_main_cta`) et le tag 319 (pixel TikTok `ttq.track("ClicMainCTA")`). Aucun tag Meta n'y est branche, verifie dans le conteneur `GTM-T59MRZ6B`, mais une rupture d'historique GA4 et un nouveau signal TikTok auraient ete crees sans necessite.
+
+**A quoi ca sert.** Un test dont un bras envoie vers une page d'offre (LP vers page offres) et l'autre vers le questionnaire (LP vers eligibilite) n'avait aucun evenement commun : seul le bras questionnaire remontait. C'est exactement ce qui est arrive au test `sp-26` de juin 2026, ou le bras `sp-26-dir` est reste a 0,25 % de CTR pendant tout le test, anomalie notee mais jamais diagnostiquee.
+
+⚠️ **Le suffixe `-offres` porte desormais du sens technique.** Une page d'offre nommee autrement (`...-tarifs`, `...-prix`) ne declenchera pas le beacon, et l'absence sera silencieuse. Si un futur test a un bras qui pointe vers une page d'offre, terminer son slug par `-offres`, ou elargir `SPLIT_CTA_RE`.
+
+Rien d'autre ne change dans la procedure d'ajout d'un test : le fichier reste universel, il ne connait aucun test ID, et il n'y a toujours rien a modifier dedans pour un nouveau test.
+
 ⚠️ **Dualité de nommage repo ↔ Framer** : dans le repo, le fichier s'appelle `override-cta.tsx` et la fonction exportée `PushDataLayerEvent`. Dans le projet Framer Poppins, le fichier équivalent dans les Code Overrides s'appelle **`Split_CTA_Tracker`** (visible dans le menu "File" du panneau Code Overrides). Quand on guide l'utilisateur côté Framer, dire **`Split_CTA_Tracker`**, pas `override-cta`.
 
 ⚠️ **Subtilité Framer** : l'override `onClick` retourné par une fonction Override ne fire pas sur les composants Link/boutons Framer (la navigation native prend le dessus). La solution est d'utiliser `useEffect` (importé depuis `"react"`, pas `"framer"`) pour attacher un event listener natif sur `document` en capture phase (`capture: true`). Cela intercepte le clic avant la navigation.

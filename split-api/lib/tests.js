@@ -32,4 +32,10 @@ export const TESTS = {
       { id: "B", url: "https://info.poppins.io/asu-2-ptf-b" },
     ],
   },
+  "rentree-26-v2": {
+    variants: [
+      { id: "A", url: "https://info.poppins.io/rentree-26-bofu-dir" },
+      { id: "B", url: "https://info.poppins.io/rentree-26-bofu-tf" },
+    ],
+  },
 };

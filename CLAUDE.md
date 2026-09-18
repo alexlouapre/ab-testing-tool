@@ -136,7 +136,13 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 
 ## Tests actifs
 
-**Aucun test actif** (depuis le 2026-08-31).
+| Test | Declare le | Variantes | URLs | Statut |
+|---|---|---|---|---|
+| `rentree-26-v2` | 2026-09-18 | A, B | A: `info.poppins.io/rentree-26-bofu-dir` · B: `info.poppins.io/rentree-26-bofu-tf` | **declare, pas encore actif** |
+
+⚠️ `rentree-26-v2` est declare cote API mais **aucun snippet n'est pose** sur une page d'entree. Le test ne tourne pas. Il ne sera active qu'une fois les CTA du bras B pointes vers le questionnaire rentree, sans quoi les deux bras seraient identiques. Voir `POPPINS_GROWTH/PROJET_Roadmap_C2_2026/PROJET_Personnalisation_Funnel_Ads_LP/SOUS_CHANTIERS/RENTREE_26_V2/`.
+
+Avant le 2026-09-18 : aucun test actif depuis le 2026-08-31.
 
 L'URL d'entree des ads `https://info.poppins.io/asu-2` sert desormais directement le contenu de la winner de `ptf-perso` (bras B : CTA vers `eligibilite-v5b-ptf`), sans snippet de redirect. Voir la section "Passer une winner a 100 % (bascule propre)".
 

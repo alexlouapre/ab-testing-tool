@@ -139,29 +139,49 @@ L'override utilise `useEffect` + `document.addEventListener("click", handler, tr
 
 ## Reset des compteurs
 
-Pour reinitialiser les compteurs d'un test (ex: `asu-2-tt` avec variantes A, B, C) :
-
-```bash
-curl "$UPSTASH_REDIS_REST_URL/pipeline" \
-  -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
-  -d '[
-    ["DEL", "events:asu-2-tt:A:clic_main_cta"],
-    ["DEL", "events:asu-2-tt:B:clic_main_cta"],
-    ["DEL", "events:asu-2-tt:C:clic_main_cta"]
-  ]'
-```
-
-Pour reset aussi les compteurs de visiteurs, ajouter :
-```bash
-["DEL", "stats:asu-2-tt:A"],
-["DEL", "stats:asu-2-tt:B"],
-["DEL", "stats:asu-2-tt:C"],
-["DEL", "counter:asu-2-tt"]
-```
-
-## Deploiement
+Un endpoint dedie fait le travail : il supprime `counter:<test>`, toutes les cles
+`stats:<test>:*` et toutes les cles `events:<test>:*`, compteurs journaliers compris.
+Il demande l'`ADMIN_TOKEN`, pas les identifiants Upstash.
 
 ```bash
 cd split-api
-npx vercel --prod
+curl -s -X POST \
+  -H "Authorization: Bearer $(grep -m1 '^ADMIN_TOKEN=' .env.local | cut -d= -f2-)" \
+  "https://split-api-one.vercel.app/api/reset?test=<test-id>"
 ```
+
+La reponse liste les cles supprimees. Verifier avec :
+
+```bash
+curl -s -H "Authorization: Bearer $ADMIN_TOKEN" \
+  "https://split-api-one.vercel.app/api/stats?test=<test-id>"
+```
+
+⚠️ **Quand reset.** Juste apres le E2E et juste avant de poser le snippet, pas avant.
+Chaque appel de verification incremente les compteurs, et tout appel passe entre le
+reset et la mise en ligne repollue le test. Une fois le snippet en ligne, ne plus
+reset : on effacerait de vrais visiteurs, qui gardent leur cookie et ne seront
+jamais recomptes.
+
+⚠️ Le proxy RTK casse `curl` → utiliser **`/usr/bin/curl`** si besoin.
+
+## Deploiement
+
+Le deploiement se fait par **`git push` sur `main`**. Le repo est connecte en
+auto-deploy au projet Vercel `split-api`, donc tout push declenche un build cote
+serveurs Vercel, independant de la connexion locale.
+
+```bash
+git add -A
+git commit -m "Deploy split test: <test-id> (<variants>)"
+git push
+```
+
+⚠️ **Ne PAS utiliser `npx vercel --prod`.** Depuis une connexion instable, la CLI
+n'arrive pas a joindre `api.vercel.com` : le deploiement reste coince en statut
+`UNKNOWN`, build `[0ms]` jamais execute, **sans remplacer la prod**. C'est ce qui
+est arrive a `quickfix-asu-2` le 29/05, reste non live 3 jours alors que le code
+etait bon.
+
+Procedure complete, re-trigger d'un build bloque et verifications post-deploy :
+voir `CLAUDE.md`, section "Deploiement = `git push`".

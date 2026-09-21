@@ -138,9 +138,17 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 
 | Test | Declare le | Variantes | URLs | Statut |
 |---|---|---|---|---|
-| `rentree-26-v2` | 2026-09-18 | A, B | A: `info.poppins.io/rentree-26-bofu-dir` · B: `info.poppins.io/rentree-26-bofu-tf` | **declare, pas encore actif** |
+| `rentree-26-v2` | 2026-09-18 | A, B | A: `info.poppins.io/rentree-26-bofu-dir` · B: `info.poppins.io/rentree-26-bofu-tf` | **actif depuis le 2026-09-21** |
 
-⚠️ `rentree-26-v2` est declare cote API mais **aucun snippet n'est pose** sur une page d'entree. Le test ne tourne pas. Il ne sera active qu'une fois les CTA du bras B pointes vers le questionnaire rentree, sans quoi les deux bras seraient identiques. Voir `POPPINS_GROWTH/PROJET_Roadmap_C2_2026/PROJET_Personnalisation_Funnel_Ads_LP/SOUS_CHANTIERS/RENTREE_26_V2/`.
+⚠️ **`rentree-26-v2` est le premier test a poser le MEME snippet sur DEUX pages d'entree** : `info.poppins.io/rentree-26-bofu` et `info.poppins.io/sp-26`. Les deux campagnes Meta convergent vers le meme test sans que leurs URL d'ads changent. Le chainage a ete ecarte : il ajoutait un chargement sur du mobile in-app, un point de panne, et le risque qu'une redirection Framer cote serveur perde la query string donc le `fbclid`.
+
+Snippet archive dans `split-api/scripts/split-redirect-rentree-26-v2.js`, pose sous le nom d'entree Custom Code `Split rentree-26-v2`. Motif `ptf-perso` et non le template : aucun bras n'est la page d'entree.
+
+⚠️ **A l'arret du test, penser aux deux pages.** Retirer le snippet d'une seule laisserait la moitie du trafic dans le test.
+
+Verifications de mise en ligne passees le 2026-09-21 : redirection sur les deux entrees, cookie pose, `fbclid` et UTM conserves jusqu'a la page de bras, et **clic compte sur les deux bras**. Ce dernier point valide le correctif `SPLIT_CTA_RE` du 2026-09-18 : c'est exactement ce qui etait casse sur `sp-26-dir` en juin, reste a 0,25 % de CTR pendant tout le test sans diagnostic.
+
+Contexte complet : `POPPINS_GROWTH/PROJET_Roadmap_C2_2026/PROJET_Personnalisation_Funnel_Ads_LP/SOUS_CHANTIERS/RENTREE_26_V2/`.
 
 Avant le 2026-09-18 : aucun test actif depuis le 2026-08-31.
 

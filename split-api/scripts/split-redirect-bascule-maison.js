@@ -1,6 +1,6 @@
 <!-- Split Test — bascule-maison (A: asu-2-bm-a, Typeform / B: asu-2-bm-b, questionnaire maison) -->
 <!-- Page d'entree : https://info.poppins.io/asu-2 (Custom Code > Head) -->
-<!-- Prepare le 2026-11-05, a poser le 16/11 (montee 10 %), 50/50 le 19/11 par les poids de lib/tests.js. -->
+<!-- Prepare le 2026-11-05, a poser au lancement (95 % Typeform, 5 % maison, decision de Hugo du 05/11), parts reglees par les poids de lib/tests.js. -->
 <!-- Note : pas de logique VARIANT_A_URL ici, A est une page distincte de la page d'entree -->
 <style id="split-hide">body{opacity:0!important}</style>
 <script>

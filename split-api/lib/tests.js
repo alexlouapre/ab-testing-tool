@@ -39,10 +39,11 @@ export const TESTS = {
     ],
   },
   // A/B Typeform contre questionnaire maison sur asu-2 (Meta). A = Typeform, en premier : le kill switch y renvoie.
-  // Montee du 16 au 18/11 : poids 9 contre 1 (10 % au maison). Le 19/11 a 0 h UTC : passer B a weight 9 (50/50).
+  // Lancement (decision de Hugo du 05/11/2026) : poids 19 contre 1, soit 95 % Typeform et 5 % maison.
+  // Changer les parts = changer ces poids (exemple : 50/50, A et B a 1).
   "bascule-maison": {
     variants: [
-      { id: "A", url: "https://info.poppins.io/asu-2-bm-a", weight: 9 },
+      { id: "A", url: "https://info.poppins.io/asu-2-bm-a", weight: 19 },
       { id: "B", url: "https://info.poppins.io/asu-2-bm-b", weight: 1 },
     ],
   },

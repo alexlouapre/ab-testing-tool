@@ -51,8 +51,12 @@ function sendSplitBeacons() {
 const CTA_PATH_RE =
     /poppins\.io\/(compatibilite|eligibilite)(-[a-z0-9]+)*(\?|\/|$)/i
 
+// Depuis le 05/11/2026, SPLIT_CTA_RE reconnait aussi le questionnaire maison
+// (https://start.poppins.io/?from=...), bras B de l'A/B Typeform contre maison
+// sur asu-2. CTA_PATH_RE n'est pas elargi : le bras maison ne pousse pas
+// clic_main_cta dans le dataLayer (pas de nouveau signal GA4 ni TikTok).
 const SPLIT_CTA_RE =
-    /poppins\.io\/(?:(?:compatibilite|eligibilite)(?:-[a-z0-9]+)*|[a-z0-9-]+-offres)(?:\?|\/|$)/i
+    /poppins\.io\/(?:(?:compatibilite|eligibilite)(?:-[a-z0-9]+)*|[a-z0-9-]+-offres)(?:\?|\/|$)|\/\/start\.poppins\.io(?:\/|\?|$)/i
 
 export function PushDataLayerEvent(): Override {
     useEffect(() => {

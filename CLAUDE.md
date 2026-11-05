@@ -139,6 +139,9 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 | Test | Declare le | Variantes | URLs | Statut |
 |---|---|---|---|---|
 | `rentree-26-v2` | 2026-09-18 | A, B | A: `info.poppins.io/rentree-26-bofu-dir` · B: `info.poppins.io/rentree-26-bofu-tf` | **actif depuis le 2026-09-21** |
+| `bascule-maison` | 2026-11-05 | A (poids 19), B (poids 1) | A: `info.poppins.io/asu-2-bm-a` (Typeform) · B: `info.poppins.io/asu-2-bm-b` (questionnaire maison `start.poppins.io`) | **actif depuis le 2026-11-05 vers 20 h** (95 % / 5 %) |
+
+`bascule-maison` : snippet `split-api/scripts/split-redirect-bascule-maison.js`, pose sous l'entree Custom Code `Split bascule-maison` (Start of `<head>`, page `/asu-2`). Publie le 05/11/2026 ; verifie : snippet et GTM en ligne sur asu-2, redirection vers B avec UTM et `fbclid` conserves. Le monitoring du questionnaire maison arme ses alarmes a 20 h 15 (`poppins-eligibility`, `monitoring.config.json`). Le secours sans API (`fallbackRandom`) tire a 50/50, pas 95/5.
 
 ⚠️ **`rentree-26-v2` est le premier test a poser le MEME snippet sur DEUX pages d'entree** : `info.poppins.io/rentree-26-bofu` et `info.poppins.io/sp-26`. Les deux campagnes Meta convergent vers le meme test sans que leurs URL d'ads changent. Le chainage a ete ecarte : il ajoutait un chargement sur du mobile in-app, un point de panne, et le risque qu'une redirection Framer cote serveur perde la query string donc le `fbclid`.
 
@@ -148,7 +151,7 @@ Snippet archive dans `split-api/scripts/split-redirect-rentree-26-v2.js`, pose s
 
 Verifications de mise en ligne passees le 2026-09-21 : redirection sur les deux entrees, cookie pose, `fbclid` et UTM conserves jusqu'a la page de bras, et **clic compte sur les deux bras**. Ce dernier point valide le correctif `SPLIT_CTA_RE` du 2026-09-18 : c'est exactement ce qui etait casse sur `sp-26-dir` en juin, reste a 0,25 % de CTR pendant tout le test sans diagnostic.
 
-Contexte complet : `POPPINS_GROWTH/PROJET_Roadmap_C2_2026/PROJET_Personnalisation_Funnel_Ads_LP/SOUS_CHANTIERS/RENTREE_26_V2/`.
+Contexte complet : `POPPINS_GROWTH/PROJET_Roadmap_C3_2026/PROJET_Personnalisation_Funnel_Ads_LP/SOUS_CHANTIERS/RENTREE_26_V2/`.
 
 Avant le 2026-09-18 : aucun test actif depuis le 2026-08-31.
 

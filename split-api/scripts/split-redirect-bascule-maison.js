@@ -3,6 +3,7 @@
 <!-- Prepare le 2026-11-05, a poser au lancement (95 % Typeform, 5 % maison, decision de Hugo du 05/11), parts reglees par les poids de lib/tests.js. -->
 <!-- 06/11/2026 : le secours (API lente ou en panne) tire avec les memes poids que l'API (95 / 5), il tirait a 50 / 50. -->
 <!-- 06/11/2026 (2) : un seul tirage par visite (le secours tirait deux fois), et chaque tirage du secours est signale a l'outil (evenement "secours"). -->
+<!-- 06/11/2026 (3) : passage a 90 % Typeform, 10 % maison (decision de Hugo), poids 9 contre 1. -->
 <!-- Les poids ci-dessous doivent rester egaux a ceux de lib/tests.js : node scripts/verify-live.mjs bascule-maison le controle. -->
 <!-- Note : pas de logique VARIANT_A_URL ici, A est une page distincte de la page d'entree -->
 <style id="split-hide">body{opacity:0!important}</style>
@@ -14,9 +15,9 @@ var SPLIT_CONFIG = {
     A: "https://info.poppins.io/asu-2-bm-a",
     B: "https://info.poppins.io/asu-2-bm-b"
   },
-  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the 95 / 5 split.
+  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the same split (90 / 10 since 06/11/2026).
   // Until 06/11/2026 it drew 50 / 50 and sent about 15 % of visitors to B (Framer Analytics, 05-06/11).
-  weights: { A: 19, B: 1 }
+  weights: { A: 9, B: 1 }
 };
 </script>
 <script>

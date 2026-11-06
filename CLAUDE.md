@@ -139,7 +139,7 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 | Test | Declare le | Variantes | URLs | Statut |
 |---|---|---|---|---|
 | `rentree-26-v2` | 2026-09-18 | A, B | A: `info.poppins.io/rentree-26-bofu-dir` · B: `info.poppins.io/rentree-26-bofu-tf` | **actif depuis le 2026-09-21** |
-| `bascule-maison` | 2026-11-05 | A (poids 19), B (poids 1) | A: `info.poppins.io/asu-2-bm-a` (Typeform) · B: `info.poppins.io/asu-2-bm-b` (questionnaire maison `start.poppins.io`) | **actif depuis le 2026-11-05 vers 20 h** (95 % / 5 %) |
+| `bascule-maison` | 2026-11-05 | A (poids 9), B (poids 1) | A: `info.poppins.io/asu-2-bm-a` (Typeform) · B: `info.poppins.io/asu-2-bm-b` (questionnaire maison `start.poppins.io`) | **actif depuis le 2026-11-05 vers 20 h** (95 % / 5 %, puis 90 % / 10 % depuis le 06/11 vers 17 h 20) |
 
 `bascule-maison` : snippet `split-api/scripts/split-redirect-bascule-maison.js`, pose sous l'entree Custom Code `Split bascule-maison` (Start of `<head>`, page `/asu-2`). Publie le 05/11/2026 ; verifie : snippet et GTM en ligne sur asu-2, redirection vers B avec UTM et `fbclid` conserves. Le monitoring du questionnaire maison arme ses alarmes a 20 h 15 (`poppins-eligibility`, `monitoring.config.json`). Le secours sans API (`fallbackRandom`, reponse de l'API au-dela de 2 s ou en erreur) tire avec les poids de `SPLIT_CONFIG.weights` (95/5) depuis le 06/11/2026 vers 1 h, republie dans Framer et verifie en ligne.
 
@@ -148,6 +148,8 @@ Le message de commit doit inclure le `test-id` et la liste des variantes (ex: `D
 ⚠️ **Regle pour tout futur test a poids inegaux** : le secours du snippet doit tirer avec les memes poids que `lib/tests.js` (copier `weights` et le `fallbackRandom` pondere de `split-redirect-bascule-maison.js`). Le template tire encore a parts egales, ce qui n'est juste que pour un 50/50.
 
 ⚠️ **Clics de B non comptes avant le 05/11/2026 vers 20 h 20** : `Split_CTA_Tracker` dans Framer etait reste a l'ancienne version (sans `start.poppins.io` dans `SPLIT_CTA_RE`), alors que `override-cta.tsx` avait ete mis a jour a 17 h. Recopie et publie a 20 h 20, clic sur B verifie. Les 6 clics B comptes entre 19 h 58 et 20 h 12 ne viennent donc pas de la page B (origine inconnue, journaux Vercel chez Alex) ; 2 clics B et 1 clic A de plus sont des verifications de Claude. Ne pas lire le taux de clics de B avant ce soir-la.
+
+**Passage a 10 % pour le bras maison le 06/11/2026** (decision de Hugo) : poids 9 contre 1 dans `lib/tests.js` et dans le script (commit f433993, outil en ligne a 17 h 16), script colle dans Framer et publie vers 17 h 20 (avec 3 changements en attente sur `/sp-26`, `/sp-26-offres` et `/sp-26-resub`, publies avec l'accord de Hugo). `verify-live.mjs` : tout conforme. Compteurs **non** remis a zero : releve a 17 h 21, A 294 tirages, 258 arrivees, 28 clics, 19 secours ; B 15 tirages, 18 arrivees, 4 clics, 1 secours (depuis 14 h 59, a 95 / 5). Juste apres une publication, `verify-live` a vu une fois la page B sans compteur de clics (copie pas encore a jour), puis tout conforme une minute plus tard : relancer avant de conclure.
 
 **Compteurs remis a zero une troisieme fois le 06/11/2026 a 14 h 59** (decision de Hugo), pour que visites, clics, arrivees et secours partent du meme moment : le tableau part de la. Releve juste avant : A 680 visites, 66 clics, 13 arrivees, 3 secours ; B 35 visites, 1 clic, 1 arrivee, 1 secours (visites et clics depuis 10 h 12, arrivees et secours depuis 14 h 45).
 

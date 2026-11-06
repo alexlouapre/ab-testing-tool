@@ -63,6 +63,14 @@ Proposition : dédoublonner par email entre la base Typeform et la base maison, 
 3. Part des leads de B sans `fbclid` ni UTM, avant et après 1 h.
 4. Région et quota Upstash dans sa console.
 
+## Résultat des contrôles (06/11, relevé à 11 h 26)
+
+- Framer Analytics (visiteurs uniques, heure de Paris) : part de asu-2-bm-b 17 % de 0 h à 1 h (avant la correction), 10 % de 1 h à 10 h, 4 à 5 % depuis 10 h (A 178, B 8). La correction marche. Le surplus de 1 h à 10 h vient probablement des parents tirés B dans la nuit, qui gardent leur cookie (déduit).
+- Taux de clic de A depuis la remise à zéro de 10 h 12 : 19 clics pour 134 tirages, environ 11 % sur les visiteurs Framer, dans l'historique d'asu-2. Le creux de la nuit venait des visites mal comptées, pas du comptage des clics.
+- B : 7 tirages, 0 clic, trop peu pour lire.
+- Départs réels vers chaque questionnaire : non mesurables depuis le poste de Hugo (Typeform n'enregistre que les fins, les parcours maison commencés sont dans le dashboard d'Alex).
+- Décision de Hugo (06/11) : le test se lit à partir du 06/11 à 1 h, heure de Paris.
+
 ## Changements de code possibles (à décider avec Hugo)
 
 | Changement | Pourquoi | Quand |

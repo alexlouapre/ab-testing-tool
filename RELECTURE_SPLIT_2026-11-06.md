@@ -71,6 +71,18 @@ Proposition : dédoublonner par email entre la base Typeform et la base maison, 
 - Départs réels vers chaque questionnaire : non mesurables depuis le poste de Hugo (Typeform n'enregistre que les fins, les parcours maison commencés sont dans le dashboard d'Alex).
 - Décision de Hugo (06/11) : le test se lit à partir du 06/11 à 1 h, heure de Paris.
 
+## Changements faits le 06/11 (Hugo : « fais-le maintenant »)
+
+Commit ee629ad, publié dans Framer vers 14 h 45, contrôlé en ligne (`verify-live.mjs` : tout conforme).
+- Arrivée comptée par la page du bras (`vue`), clic compté pour le test et le bras de la page ; un ancien cookie n'ajoute plus de clic depuis une autre landing.
+- Script : un seul tirage par visite, chaque tirage du secours signalé (`secours`), pas de cache.
+- Serveur : configuration et compteur lus en un seul aller-retour vers Redis, `no-store`.
+- Tableau de bord : arrivées, clics par arrivée, secours.
+- `scripts/verify-live.mjs` : contrôle en lecture seule que le script en ligne, ses poids et le compteur publié correspondent au dépôt. Les poids restent écrits à deux endroits (l'outil et le secours du script, qui doit pouvoir tirer quand l'outil ne répond pas), mais ce contrôle refuse tout écart.
+- Testé : fausse base Redis (95/5, coupe-circuit, bras forcé), compteur dans une page simulée, script dans Chromium avec une fausse API lente (11 cas, 1 000 tirages : 4,9 % de B). Premières arrivées et premiers secours vus en ligne à 14 h 52.
+
+Non fait : fonction Vercel en Europe (région Upstash à vérifier d'abord), jetons dans l'URL du tableau de bord, skill et template de déploiement, `test-e2e.mjs`, `config.js`.
+
 ## Changements de code possibles (à décider avec Hugo)
 
 | Changement | Pourquoi | Quand |

@@ -1,6 +1,7 @@
-<!-- Split Test — bascule-maison (A: asu-2-bm-a, Typeform / B: asu-2-bm-b, questionnaire maison) -->
+<!-- Split Test : bascule-maison (A: asu-2-bm-a, Typeform / B: asu-2-bm-b, questionnaire maison) -->
 <!-- Page d'entree : https://info.poppins.io/asu-2 (Custom Code > Head) -->
 <!-- Prepare le 2026-11-05, a poser au lancement (95 % Typeform, 5 % maison, decision de Hugo du 05/11), parts reglees par les poids de lib/tests.js. -->
+<!-- 06/11/2026 : le secours (API lente ou en panne) tire avec les memes poids que l'API (95 / 5), il tirait a 50 / 50. -->
 <!-- Note : pas de logique VARIANT_A_URL ici, A est une page distincte de la page d'entree -->
 <style id="split-hide">body{opacity:0!important}</style>
 <script>
@@ -10,7 +11,10 @@ var SPLIT_CONFIG = {
   variants: {
     A: "https://info.poppins.io/asu-2-bm-a",
     B: "https://info.poppins.io/asu-2-bm-b"
-  }
+  },
+  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the 95 / 5 split.
+  // Until 06/11/2026 it drew 50 / 50 and sent about 15 % of visitors to B (Framer Analytics, 05-06/11).
+  weights: { A: 19, B: 1 }
 };
 </script>
 <script>
@@ -48,7 +52,15 @@ var SPLIT_CONFIG = {
 
   function fallbackRandom() {
     var keys = Object.keys(VARIANTS);
-    var pick = keys[Math.floor(Math.random() * keys.length)];
+    var weights = SPLIT_CONFIG.weights || {};
+    var total = 0;
+    for (var i = 0; i < keys.length; i++) total += weights[keys[i]] || 1;
+    var r = Math.random() * total;
+    var pick = keys[keys.length - 1];
+    for (var j = 0; j < keys.length; j++) {
+      r -= weights[keys[j]] || 1;
+      if (r < 0) { pick = keys[j]; break; }
+    }
     setCookie(COOKIE_NAME, pick, COOKIE_DAYS);
     applyVariant(pick);
   }

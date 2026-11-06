@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { TESTS } from "../lib/tests.js";
+import { ALLOWED_EVENTS } from "../lib/events.js";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -49,11 +50,12 @@ export default async function handler(req, res) {
 
   const hasDateRange = from && to;
 
-  // Always fetch global totals
+  // Always fetch global totals: draws (visits) and every event
   const statsKeys = test.variants.map((v) => `stats:${testId}:${v.id}`);
-  const eventKeys = test.variants.map(
-    (v) => `events:${testId}:${v.id}:clic_main_cta`
-  );
+  const eventKeys = [];
+  for (const event of ALLOWED_EVENTS) {
+    for (const v of test.variants) eventKeys.push(`events:${testId}:${v.id}:${event}`);
+  }
   const globalValues = await Promise.all(
     [...statsKeys, ...eventKeys].map((k) => redis.get(k))
   );
@@ -61,21 +63,24 @@ export default async function handler(req, res) {
   const variantCount = test.variants.length;
   const stats = {};
   let total = 0;
-  const ctaEvents = {};
+  const events = {};
 
   test.variants.forEach((v, i) => {
     const count = globalValues[i] || 0;
     stats[v.id] = count;
     total += count;
-    ctaEvents[v.id] = globalValues[variantCount + i] || 0;
+  });
+  ALLOWED_EVENTS.forEach((event, e) => {
+    events[event] = {};
+    test.variants.forEach((v, i) => {
+      events[event][v.id] = globalValues[variantCount * (e + 1) + i] || 0;
+    });
   });
 
   const result = {
     ...stats,
     total,
-    events: {
-      clic_main_cta: ctaEvents,
-    },
+    events,
   };
 
   // If date range requested, fetch daily keys
@@ -86,7 +91,9 @@ export default async function handler(req, res) {
     for (const day of days) {
       for (const v of test.variants) {
         dailyKeys.push(`stats:${testId}:${v.id}:d:${day}`);
-        dailyKeys.push(`events:${testId}:${v.id}:clic_main_cta:d:${day}`);
+        for (const event of ALLOWED_EVENTS) {
+          dailyKeys.push(`events:${testId}:${v.id}:${event}:d:${day}`);
+        }
       }
     }
 
@@ -99,11 +106,9 @@ export default async function handler(req, res) {
     for (const day of days) {
       daily[day] = {};
       for (const v of test.variants) {
-        daily[day][v.id] = {
-          visits: dailyValues[idx] || 0,
-          clic_main_cta: dailyValues[idx + 1] || 0,
-        };
-        idx += 2;
+        const row = { visits: dailyValues[idx++] || 0 };
+        for (const event of ALLOWED_EVENTS) row[event] = dailyValues[idx++] || 0;
+        daily[day][v.id] = row;
       }
     }
 

@@ -1,12 +1,11 @@
 import { Redis } from "@upstash/redis";
 import { TESTS } from "../lib/tests.js";
+import { ALLOWED_EVENTS } from "../lib/events.js";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
-
-const ALLOWED_EVENTS = ["clic_main_cta"];
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

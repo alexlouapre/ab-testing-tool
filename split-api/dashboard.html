@@ -474,11 +474,20 @@
 
         variantsEl.innerHTML = "";
         const ctaEvents = data.events && data.events.clic_main_cta || {};
+        const viewEvents = data.events && data.events.vue || {};
+        const fallbackEvents = data.events && data.events.secours || {};
+        const totalViews = Object.values(viewEvents).reduce((a, b) => a + b, 0);
         Object.entries(test.variants).forEach(([key, cfg]) => {
           const count = data[key] || 0;
           const pct = data.total > 0 ? ((count / data.total) * 100).toFixed(1) : "0.0";
           const ctaCount = ctaEvents[key] || 0;
           const convRate = count > 0 ? ((ctaCount / count) * 100).toFixed(1) : "0.0";
+          // Arrivals are sent by the variant page itself (since 06/11/2026): the true
+          // denominator. Draws (count above) also include visitors who never landed.
+          const views = viewEvents[key] || 0;
+          const viewPct = totalViews > 0 ? ((views / totalViews) * 100).toFixed(1) : "0.0";
+          const viewConv = views > 0 ? ((ctaCount / views) * 100).toFixed(1) : "-";
+          const fallbacks = fallbackEvents[key] || 0;
 
           const div = document.createElement("div");
           div.className = "variant-card";
@@ -490,6 +499,10 @@
             <div class="cta-divider"></div>
             <div class="cta-count">Click main_cta : ${ctaCount.toLocaleString("fr-FR")}</div>
             <div class="cta-conv">conv : ${convRate} %</div>
+            <div class="cta-divider"></div>
+            <div class="cta-count">Arrivées sur la page : ${views.toLocaleString("fr-FR")} (${viewPct} %)</div>
+            <div class="cta-conv">clics / arrivées : ${viewConv} %</div>
+            <div class="cta-count">Tirés par le secours : ${fallbacks.toLocaleString("fr-FR")}</div>
             <div class="url"><a href="${cfg.url}" target="_blank">${cfg.url.replace("https://", "")}</a></div>
           `;
           variantsEl.appendChild(div);
@@ -587,6 +600,8 @@
         thead += `<th style="color:${variants[key].color}">V.${key} visits</th>`;
         thead += `<th style="color:${variants[key].color}">V.${key} CTA</th>`;
         thead += `<th style="color:${variants[key].color}">V.${key} conv</th>`;
+        thead += `<th style="color:${variants[key].color}">V.${key} arrivées</th>`;
+        thead += `<th style="color:${variants[key].color}">V.${key} secours</th>`;
       });
       thead += `</tr></thead>`;
 
@@ -599,6 +614,8 @@
           tbody += `<td>${v.visits}</td>`;
           tbody += `<td>${v.clic_main_cta}</td>`;
           tbody += `<td>${conv}%</td>`;
+          tbody += `<td>${v.vue || 0}</td>`;
+          tbody += `<td>${v.secours || 0}</td>`;
         });
         tbody += `</tr>`;
       });

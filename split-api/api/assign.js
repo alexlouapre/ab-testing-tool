@@ -10,6 +10,8 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "https://info.poppins.io",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
+  // A draw must never be served again from a cache.
+  "Cache-Control": "no-store",
 };
 
 export default async function handler(req, res) {
@@ -29,8 +31,14 @@ export default async function handler(req, res) {
   const test = TESTS[testId];
 
   try {
-    // Check kill switch / forced config
-    const configData = await redis.get(`config:${testId}`);
+    // Kill switch / forced config and the round-robin counter in one round trip
+    // to Redis (06/11/2026: the API answered after 2 s for many visitors). The
+    // counter also moves when the test is paused or forced: harmless.
+    const [configData, counter] = await redis
+      .pipeline()
+      .get(`config:${testId}`)
+      .incr(`counter:${testId}`)
+      .exec();
     if (configData) {
       if (configData.enabled === false) {
         const fallback = test.variants[0];
@@ -57,7 +65,6 @@ export default async function handler(req, res) {
 
     // Atomic round-robin counter (weighted if variants have a `weight` field)
     const slots = test.variants.flatMap(v => Array(v.weight || 1).fill(v));
-    const counter = await redis.incr(`counter:${testId}`);
     const variant = slots[(counter - 1) % slots.length];
 
     // Increment per-variant stats (global + daily)

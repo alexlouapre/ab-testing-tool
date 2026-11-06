@@ -2,6 +2,8 @@
 <!-- Page d'entree : https://info.poppins.io/asu-2 (Custom Code > Head) -->
 <!-- Prepare le 2026-11-05, a poser au lancement (95 % Typeform, 5 % maison, decision de Hugo du 05/11), parts reglees par les poids de lib/tests.js. -->
 <!-- 06/11/2026 : le secours (API lente ou en panne) tire avec les memes poids que l'API (95 / 5), il tirait a 50 / 50. -->
+<!-- 06/11/2026 (2) : un seul tirage par visite (le secours tirait deux fois), et chaque tirage du secours est signale a l'outil (evenement "secours"). -->
+<!-- Les poids ci-dessous doivent rester egaux a ceux de lib/tests.js : node scripts/verify-live.mjs bascule-maison le controle. -->
 <!-- Note : pas de logique VARIANT_A_URL ici, A est une page distincte de la page d'entree -->
 <style id="split-hide">body{opacity:0!important}</style>
 <script>
@@ -23,6 +25,10 @@ var SPLIT_CONFIG = {
   var COOKIE_NAME = SPLIT_CONFIG.cookie;
   var COOKIE_DAYS = 30;
   var VARIANTS = SPLIT_CONFIG.variants;
+  var TRACK_URL = "https://split-api-one.vercel.app/api/track?test=" + SPLIT_CONFIG.test;
+  // First decision wins: the timeout, the aborted request and a late answer
+  // could each draw and redirect again.
+  var decided = false;
 
   var safetyTimer = setTimeout(showPage, 3000);
 
@@ -41,7 +47,15 @@ var SPLIT_CONFIG = {
     document.cookie = name + "=" + value + "; path=/; max-age=" + maxAge + "; SameSite=Lax; Secure";
   }
 
+  function trackFallback(variantId) {
+    var url = TRACK_URL + "&variant=" + variantId + "&event=secours";
+    try { if (navigator.sendBeacon && navigator.sendBeacon(url)) return; } catch (e) {}
+    try { fetch(url, { method: "GET", keepalive: true, mode: "no-cors" }).catch(function () {}); } catch (e) {}
+  }
+
   function applyVariant(variantId) {
+    if (decided) return;
+    decided = true;
     clearTimeout(safetyTimer);
     var url = VARIANTS[variantId];
     if (!url) { showPage(); return; }
@@ -51,6 +65,7 @@ var SPLIT_CONFIG = {
   }
 
   function fallbackRandom() {
+    if (decided) return;
     var keys = Object.keys(VARIANTS);
     var weights = SPLIT_CONFIG.weights || {};
     var total = 0;
@@ -62,6 +77,7 @@ var SPLIT_CONFIG = {
       if (r < 0) { pick = keys[j]; break; }
     }
     setCookie(COOKIE_NAME, pick, COOKIE_DAYS);
+    trackFallback(pick);
     applyVariant(pick);
   }
 
@@ -74,12 +90,15 @@ var SPLIT_CONFIG = {
     fallbackRandom();
   }, 2000);
 
-  fetch(API_URL, { signal: controller ? controller.signal : undefined })
+  fetch(API_URL, { signal: controller ? controller.signal : undefined, cache: "no-store" })
     .then(function (res) { return res.json(); })
     .then(function (data) {
       clearTimeout(fetchTimeout);
+      if (decided) return;
       if (data && data.variant && VARIANTS[data.variant]) {
         setCookie(COOKIE_NAME, data.variant, COOKIE_DAYS);
+        // Redis down: the API sent A without counting it, count it as a fallback.
+        if (data.fallback) trackFallback(data.variant);
         applyVariant(data.variant);
       } else { fallbackRandom(); }
     })

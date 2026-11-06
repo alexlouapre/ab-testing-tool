@@ -40,8 +40,12 @@ export const TESTS = {
   },
   // A/B Typeform contre questionnaire maison sur asu-2 (Meta). A = Typeform, en premier : le kill switch y renvoie.
   // Lancement (decision de Hugo du 05/11/2026) : poids 19 contre 1, soit 95 % Typeform et 5 % maison.
-  // Changer les parts = changer ces poids (exemple : 50/50, A et B a 1).
+  // Changer les parts = changer ces poids (exemple : 50/50, A et B a 1) ET les memes poids dans
+  // scripts/split-redirect-bascule-maison.js (secours), coller dans Framer, Publish, puis
+  // node scripts/verify-live.mjs bascule-maison, qui refuse tout ecart.
   "bascule-maison": {
+    // Entry page carrying the snippet (read by scripts/verify-live.mjs).
+    entry: "https://info.poppins.io/asu-2",
     variants: [
       { id: "A", url: "https://info.poppins.io/asu-2-bm-a", weight: 19 },
       { id: "B", url: "https://info.poppins.io/asu-2-bm-b", weight: 1 },

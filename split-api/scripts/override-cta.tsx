@@ -5,29 +5,77 @@ import { useEffect } from "react"
 import { Override } from "framer"
 
 let beaconSent = false
+let viewSent = false
+
+const TRACK_URL = "https://split-api-one.vercel.app/api/track"
+
+// Variant pages of the running tests, by path (06/11/2026). On these pages the
+// variant is the page itself, not the cookie: the arrival is counted ("vue"),
+// and a click is counted only for this test and this variant. Without that, a
+// parent drawn B who clicks on another landing added a B click, and a page
+// reached without a draw (shared link) was counted in the cookie's variant.
+// A new test whose variant pages are not the entry page: add its pages here.
+const PAGE_TESTS: Record<string, { test: string; variant: string }> = {
+    "/asu-2-bm-a": { test: "bascule-maison", variant: "A" },
+    "/asu-2-bm-b": { test: "bascule-maison", variant: "B" },
+}
+
+// Tests counted only from their own pages: their cookie never adds a click
+// from another page.
+const PAGE_TEST_IDS = new Set(Object.values(PAGE_TESTS).map((p) => p.test))
+
+function pageTest() {
+    const path = window.location.pathname.replace(/\/+$/, "")
+    return PAGE_TESTS[path] || null
+}
+
+function sendBeacon(testId: string, variant: string, event: string) {
+    const url = `${TRACK_URL}?test=${testId}&variant=${variant}&event=${event}`
+    let queued = false
+    try {
+        queued = navigator.sendBeacon(url)
+    } catch {}
+    if (!queued) {
+        try {
+            fetch(url, {
+                method: "GET",
+                keepalive: true,
+                mode: "no-cors",
+            }).catch(() => {})
+        } catch {}
+    }
+}
+
+// One arrival per tab and variant page: a reload or a back from the
+// questionnaire in the same tab is not counted again.
+function sendViewBeacon() {
+    if (viewSent) return
+    viewSent = true
+    const page = pageTest()
+    if (!page) return
+    const key = `split_vue_${page.test}_${page.variant}`
+    try {
+        if (sessionStorage.getItem(key)) return
+        sessionStorage.setItem(key, "1")
+    } catch {}
+    sendBeacon(page.test, page.variant, "vue")
+}
 
 function sendSplitBeacons() {
     if (beaconSent) return
     beaconSent = true
+    const page = pageTest()
+    if (page) {
+        sendBeacon(page.test, page.variant, "clic_main_cta")
+        return
+    }
     const cookies = document.cookie.split(";")
     for (const c of cookies) {
         const [name, variant] = c.trim().split("=")
         if (name.startsWith("split_") && variant) {
             const testId = name.slice(6).replace(/_/g, "-")
-            const url = `https://split-api-one.vercel.app/api/track?test=${testId}&variant=${variant}&event=clic_main_cta`
-            let queued = false
-            try {
-                queued = navigator.sendBeacon(url)
-            } catch {}
-            if (!queued) {
-                try {
-                    fetch(url, {
-                        method: "GET",
-                        keepalive: true,
-                        mode: "no-cors",
-                    }).catch(() => {})
-                } catch {}
-            }
+            if (PAGE_TEST_IDS.has(testId)) continue
+            sendBeacon(testId, variant, "clic_main_cta")
         }
     }
 }
@@ -60,6 +108,7 @@ const SPLIT_CTA_RE =
 
 export function PushDataLayerEvent(): Override {
     useEffect(() => {
+        sendViewBeacon()
         function handleClick(e: MouseEvent) {
             // Ignore modifier-clicks (cmd/ctrl/shift/middle) : le navigateur ouvre un nouvel onglet,
             // la page reste vivante, donc sendBeacon flush normalement, rien a intercepter

@@ -1,6 +1,6 @@
 # Cadrage : questionnaire maison sur une part du trafic YouTube (09/11/2026)
 
-Statut : **proposition, rien en ligne**.
+Statut : **en ligne depuis le 09/11/2026 vers 18 h 05** (test `yt-maison`, 50 / 50, compteurs remis a zero a 18 h 14). Reste ouvert : la reponse d'Alex sur le tri par source dans son tableau de bord.
 
 ## Objectif (Hugo, 09/11)
 

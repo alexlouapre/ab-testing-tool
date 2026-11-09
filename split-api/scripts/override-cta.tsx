@@ -18,6 +18,8 @@ const TRACK_URL = "https://split-api-one.vercel.app/api/track"
 const PAGE_TESTS: Record<string, { test: string; variant: string }> = {
     "/asu-2-bm-a": { test: "bascule-maison", variant: "A" },
     "/asu-2-bm-b": { test: "bascule-maison", variant: "B" },
+    "/asu-2-yt-a": { test: "yt-maison", variant: "A" },
+    "/asu-2-yt-b": { test: "yt-maison", variant: "B" },
 }
 
 // Tests counted only from their own pages: their cookie never adds a click

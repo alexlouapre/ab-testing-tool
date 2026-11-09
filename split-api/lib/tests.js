@@ -53,4 +53,16 @@ export const TESTS = {
       { id: "B", url: "https://info.poppins.io/asu-2-bm-b", weight: 1 },
     ],
   },
+  // Controle des sources du questionnaire maison sur le trafic YouTube (asu-2-yt). A = Typeform V5, en premier :
+  // le kill switch y renvoie. 50/50 (decision de Hugo du 09/11/2026). But : verifier que le tableau de bord
+  // du maison range bien les parcours YouTube a part de Meta, pas mesurer un ecart.
+  // Cadrage : CADRAGE_SPLIT_YOUTUBE_2026-11-09.md. Memes poids dans scripts/split-redirect-yt-maison.js.
+  "yt-maison": {
+    // Entry page carrying the snippet (read by scripts/verify-live.mjs).
+    entry: "https://info.poppins.io/asu-2-yt",
+    variants: [
+      { id: "A", url: "https://info.poppins.io/asu-2-yt-a", weight: 1 },
+      { id: "B", url: "https://info.poppins.io/asu-2-yt-b", weight: 1 },
+    ],
+  },
 };

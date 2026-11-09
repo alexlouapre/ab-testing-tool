@@ -31,8 +31,15 @@ Pas mesurer une différence entre Typeform et le maison. **Vérifier que le tabl
 
 Puissance statistique, page de résultat différente selon le bras, parcours d'emails : utiles pour comparer, pas pour vérifier les sources.
 
-## À vérifier avant la mise en ligne
+## Mise en ligne (09/11/2026)
 
-1. Avec Alex : le tableau de bord sait-il filtrer ou ranger par source (et pas seulement par `from`) ? Le monitoring suit `from=asu-2-bm-b` ; une autre valeur est-elle acceptée ?
-2. Faire un passage de contrôle avant le trafic réel : `asu-2-yt?utm_source=youtube&gclid=test-hugo` jusqu'au maison, puis lecture dans le tableau de bord.
-3. Ajouter `asu-2-yt-a` aux scripts d'analyse V5, sinon le trafic Typeform YouTube disparaît des tableaux.
+- Outil : test `yt-maison` ajouté et poussé (commit `db3ed8c`), contrôle de bout en bout réussi.
+- Framer : pages `asu-2-yt-a` et `asu-2-yt-b` créées par Hugo, `Split_CTA_Tracker` mis à jour (2 lignes), entrée Custom Code `Split yt-maison` (Start of `<head>`, page `/asu-2-yt`), publié vers 18 h 05.
+- `verify-live` conforme pour `yt-maison` et `bascule-maison` à 18 h 13. Compteurs `yt-maison` remis à zéro à 18 h 14.
+
+## Ce qui reste ouvert
+
+1. **Alex** (message donné à Hugo le 09/11, envoi par Hugo) : le tableau de bord sait-il trier par source (`utm_source`), pas seulement par `from` ? Le monitoring accepte-t-il un `from` autre que `asu-2-bm-b` sans fausse alerte ?
+2. **Lecture** : vers le 16/11, regarder dans le tableau de bord maison si chaque parcours parti de `from=asu-2-yt-b` est rangé en YouTube (critère de réussite ci-dessus), puis décider avec Hugo : arrêt ou part conservée.
+3. Pas de passage de contrôle avec une fausse visite jusqu'au maison : écarté pour ne pas mettre de faux parcours dans le tableau de bord qu'on veut lire.
+4. Ajouter `asu-2-yt-a` aux scripts d'analyse V5 (`PROJET_ANALYSE_TYPEFORM_ELIGIBILITY`), sinon le trafic Typeform YouTube disparaît des tableaux.

@@ -16,9 +16,9 @@ var SPLIT_CONFIG = {
     A: "https://info.poppins.io/asu-2-bm-a",
     B: "https://info.poppins.io/asu-2-bm-b"
   },
-  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the same split (80 / 20 since 09/11/2026).
+  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the same split (70 / 30 since 10/11/2026).
   // Until 06/11/2026 it drew 50 / 50 and sent about 15 % of visitors to B (Framer Analytics, 05-06/11).
-  weights: { A: 4, B: 1 }
+  weights: { A: 7, B: 3 }
 };
 </script>
 <script>

@@ -42,6 +42,7 @@ export const TESTS = {
   // Lancement (decision de Hugo du 05/11/2026) : poids 19 contre 1, soit 95 % Typeform et 5 % maison.
   // 06/11/2026 (decision de Hugo) : poids 9 contre 1, soit 90 % Typeform et 10 % maison.
   // 09/11/2026 (decision de Hugo) : poids 4 contre 1, soit 80 % Typeform et 20 % maison.
+  // 10/11/2026 (decision de Hugo) : poids 7 contre 3, soit 70 % Typeform et 30 % maison.
   // Changer les parts = changer ces poids (exemple : 50/50, A et B a 1) ET les memes poids dans
   // scripts/split-redirect-bascule-maison.js (secours), coller dans Framer, Publish, puis
   // node scripts/verify-live.mjs bascule-maison, qui refuse tout ecart.
@@ -49,8 +50,8 @@ export const TESTS = {
     // Entry page carrying the snippet (read by scripts/verify-live.mjs).
     entry: "https://info.poppins.io/asu-2",
     variants: [
-      { id: "A", url: "https://info.poppins.io/asu-2-bm-a", weight: 4 },
-      { id: "B", url: "https://info.poppins.io/asu-2-bm-b", weight: 1 },
+      { id: "A", url: "https://info.poppins.io/asu-2-bm-a", weight: 7 },
+      { id: "B", url: "https://info.poppins.io/asu-2-bm-b", weight: 3 },
     ],
   },
   // Controle des sources du questionnaire maison sur le trafic YouTube (asu-2-yt). A = Typeform V5, en premier :

@@ -5,6 +5,7 @@
 <!-- 06/11/2026 (2) : un seul tirage par visite (le secours tirait deux fois), et chaque tirage du secours est signale a l'outil (evenement "secours"). -->
 <!-- 06/11/2026 (3) : passage a 90 % Typeform, 10 % maison (decision de Hugo), poids 9 contre 1. -->
 <!-- 09/11/2026 : passage a 80 % Typeform, 20 % maison (decision de Hugo), poids 4 contre 1. -->
+<!-- 10/11/2026 : passage a 70 % Typeform, 30 % maison (decision de Hugo), poids 7 contre 3. -->
 <!-- Les poids ci-dessous doivent rester egaux a ceux de lib/tests.js : node scripts/verify-live.mjs bascule-maison le controle. -->
 <!-- Note : pas de logique VARIANT_A_URL ici, A est une page distincte de la page d'entree -->
 <style id="split-hide">body{opacity:0!important}</style>

@@ -37,6 +37,22 @@ Puissance statistique, page de résultat différente selon le bras, parcours d'e
 - Framer : pages `asu-2-yt-a` et `asu-2-yt-b` créées par Hugo, `Split_CTA_Tracker` mis à jour (2 lignes), entrée Custom Code `Split yt-maison` (Start of `<head>`, page `/asu-2-yt`), publié vers 18 h 05.
 - `verify-live` conforme pour `yt-maison` et `bascule-maison` à 18 h 13. Compteurs `yt-maison` remis à zéro à 18 h 14.
 
+## Relevé intermédiaire (11/11/2026, demande de Hugo)
+
+Comparaison donnée à titre indicatif : le test n'est pas fait pour comparer, et les volumes ne permettent aucune conclusion.
+
+| Depuis le 09/11 18 h 14 (Paris) | Typeform (A) | Maison (B) |
+|---|---|---|
+| Arrivées sur la page de bras (outil de split) | 313 | 324 |
+| Clics sur le bouton | 23 (7,3 %) | 19 (5,9 %) |
+| Questionnaires avec email, du 09/11 18 h 14 au 10/11 15 h 48 | 2 | 2 |
+| dont éligibles, fils ou fille | 2 | 2 |
+
+- Sources : `/api/stats?test=yt-maison` ; Snowflake `AIRBYTE_SCHEMA.ELIGIBILITY_V5` (`LANDING = 'asu-2-yt-a'`) et `POSTGRES_ELIGIBILITY.ELIGIBILITYRUNS` (`FROM = 'asu-2-yt-b'`, hors tests), Metabase base 2.
+- Période commune bornée par la copie du maison dans Snowflake, arrêtée au 10/11 14 h 48 UTC (celle de Typeform allait jusqu'au 11/11 5 h 16 UTC). Typeform a 2 questionnaires de plus le 10/11 au soir.
+- Les 4 questionnaires Typeform venus d'`asu-2-yt-a` portent `utm_source=youtube`. La source des 2 parcours maison n'a pas été vérifiée.
+- À surveiller : si la copie du maison dans Snowflake ne repart pas, le signaler à Alex.
+
 ## Ce qui reste ouvert
 
 1. **Alex** (message donné à Hugo le 09/11, envoi par Hugo) : le tableau de bord sait-il trier par source (`utm_source`), pas seulement par `from` ? Le monitoring accepte-t-il un `from` autre que `asu-2-bm-b` sans fausse alerte ?

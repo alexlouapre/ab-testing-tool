@@ -184,6 +184,8 @@ Snippet archive dans `split-api/scripts/split-redirect-rentree-26-v2.js`, pose s
 
 ⚠️ **A l'arret du test, penser aux deux pages.** Retirer le snippet d'une seule laisserait la moitie du trafic dans le test.
 
+**Depuis au plus tard le 10/11/2026, `sp-26` est en brouillon dans Framer** (page introuvable, comme `sp-26-offres`, `-resub`, `-dir`) : le test ne tourne plus que sur `rentree-26-bofu`. Framer : 21 visiteurs sur `/sp-26` du 11/10 au 10/11, donc pubs a priori deja coupees (a confirmer par Hugo dans Meta). Auteur et date de la mise en brouillon inconnus.
+
 Verifications de mise en ligne passees le 2026-09-21 : redirection sur les deux entrees, cookie pose, `fbclid` et UTM conserves jusqu'a la page de bras, et **clic compte sur les deux bras**. Ce dernier point valide le correctif `SPLIT_CTA_RE` du 2026-09-18 : c'est exactement ce qui etait casse sur `sp-26-dir` en juin, reste a 0,25 % de CTR pendant tout le test sans diagnostic.
 
 Contexte complet : `POPPINS_GROWTH/PROJET_Roadmap_C3_2026/PROJET_Personnalisation_Funnel_Ads_LP/SOUS_CHANTIERS/RENTREE_26_V2/`.

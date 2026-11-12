@@ -53,6 +53,25 @@ Comparaison donnée à titre indicatif : le test n'est pas fait pour comparer, e
 - Les 4 questionnaires Typeform venus d'`asu-2-yt-a` portent `utm_source=youtube`. La source des 2 parcours maison n'a pas été vérifiée.
 - À surveiller : si la copie du maison dans Snowflake ne repart pas, le signaler à Alex.
 
+## Lecture du critère et relevé (12/11/2026 vers 19 h 50)
+
+**Critère rempli** : les 7 parcours maison partis de `from=asu-2-yt-b` (hors tests, du 09/11 20 h 58 au 12/11 15 h 43) sont tous rangés `YouTube Ads` en premier et en dernier canal, avec `utm_source=youtube`, aucun clic Meta. Aucun n'est en Meta ni sans source. Dans l'autre sens, les 152 parcours partis d'`asu-2-bm-b` sur la même période sont tous rangés `Meta payant` (145) ou `Meta indistinct` (7), aucun en YouTube.
+
+Limites : vérifié dans la copie Snowflake de la base du maison (`POSTGRES_ELIGIBILITY.ELIGIBILITYRUNS`, colonnes `FIRSTCHANNEL` / `LASTCHANNEL`, copie du 12/11 16 h 27), pas dans l'écran du tableau de bord d'Alex. Cette table ne contient que des parcours terminés : les abandons ne sont pas vérifiés. 7 parcours, pas les 20 prévus.
+
+| Depuis le 09/11 18 h 14 (Paris) | Typeform (A) | Maison (B) |
+|---|---|---|
+| Tirages (outil de split) | 658 | 657 |
+| Arrivées sur la page de bras | 506 | 537 |
+| Clics sur le bouton | 44 (8,7 %) | 36 (6,7 %) |
+| Secours | 23 | 29 |
+| Questionnaires terminés | 11 (copie arrêtée au 12/11 vers 4 h) | 7 (copie arrêtée au 12/11 vers 16 h) |
+| dont éligibles, fils ou fille | 6 | 7 |
+
+- L'écart de clics (2 points) n'est pas significatif à ces volumes (environ 1,2 écart-type).
+- Les 11 Typeform portent `utm_source=youtube`. Les 5 Typeform en plus des 6 éligibles fils ou fille sont des non-éligibles ou d'autres relations (petit frère, patient).
+- Sources : `/api/stats?test=yt-maison` à 19 h 48 ; Snowflake `AIRBYTE_SCHEMA.ELIGIBILITY_V5` (`LANDING = 'asu-2-yt-a'`) et `POSTGRES_ELIGIBILITY.ELIGIBILITYRUNS`, Metabase base 2. La copie du maison dans Snowflake est repartie (elle était arrêtée au 10/11).
+
 ## Ce qui reste ouvert
 
 1. **Alex** (message donné à Hugo le 09/11, envoi par Hugo) : le tableau de bord sait-il trier par source (`utm_source`), pas seulement par `from` ? Le monitoring accepte-t-il un `from` autre que `asu-2-bm-b` sans fausse alerte ?

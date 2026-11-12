@@ -1,6 +1,6 @@
 # Cadrage : questionnaire maison sur une part du trafic YouTube (09/11/2026)
 
-Statut : **en ligne depuis le 09/11/2026 vers 18 h 05** (test `yt-maison`, 50 / 50, compteurs remis a zero a 18 h 14). Reste ouvert : la reponse d'Alex sur le tri par source dans son tableau de bord.
+Statut : **en ligne depuis le 09/11/2026 vers 18 h 05** (test `yt-maison`, 50 / 50, compteurs remis a zero a 18 h 14). **Critère rempli le 12/11, part maison conservée à 50 % (décision de Hugo du 12/11), sans date de fin.** Reste ouvert : la reponse d'Alex sur le tri par source dans son tableau de bord.
 
 ## Objectif (Hugo, 09/11)
 
@@ -75,6 +75,6 @@ Limites : vérifié dans la copie Snowflake de la base du maison (`POSTGRES_ELIG
 ## Ce qui reste ouvert
 
 1. **Alex** (message donné à Hugo le 09/11, envoi par Hugo) : le tableau de bord sait-il trier par source (`utm_source`), pas seulement par `from` ? Le monitoring accepte-t-il un `from` autre que `asu-2-bm-b` sans fausse alerte ?
-2. **Lecture** : vers le 16/11, regarder dans le tableau de bord maison si chaque parcours parti de `from=asu-2-yt-b` est rangé en YouTube (critère de réussite ci-dessus), puis décider avec Hugo : arrêt ou part conservée.
+2. ~~**Lecture**~~ : fait le 12/11 (critère rempli, 7 sur 7). Décision de Hugo le 12/11 : part conservée.
 3. Pas de passage de contrôle avec une fausse visite jusqu'au maison : écarté pour ne pas mettre de faux parcours dans le tableau de bord qu'on veut lire.
 4. Ajouter `asu-2-yt-a` aux scripts d'analyse V5 (`PROJET_ANALYSE_TYPEFORM_ELIGIBILITY`), sinon le trafic Typeform YouTube disparaît des tableaux.

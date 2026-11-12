@@ -7,6 +7,7 @@
 <!-- 09/11/2026 : passage a 80 % Typeform, 20 % maison (decision de Hugo), poids 4 contre 1. -->
 <!-- 10/11/2026 : passage a 70 % Typeform, 30 % maison (decision de Hugo), poids 7 contre 3. -->
 <!-- 11/11/2026 : passage a 60 % Typeform, 40 % maison (decision de Hugo), poids 3 contre 2. -->
+<!-- 12/11/2026 : passage a 50 % Typeform, 50 % maison (decision de Hugo), poids 1 contre 1. -->
 <!-- Les poids ci-dessous doivent rester egaux a ceux de lib/tests.js : node scripts/verify-live.mjs bascule-maison le controle. -->
 <!-- Note : pas de logique VARIANT_A_URL ici, A est une page distincte de la page d'entree -->
 <style id="split-hide">body{opacity:0!important}</style>
@@ -18,9 +19,9 @@ var SPLIT_CONFIG = {
     A: "https://info.poppins.io/asu-2-bm-a",
     B: "https://info.poppins.io/asu-2-bm-b"
   },
-  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the same split (60 / 40 since 11/11/2026).
+  // Same weights as lib/tests.js: the fallback (API slow or down) must keep the same split (50 / 50 since 12/11/2026).
   // Until 06/11/2026 it drew 50 / 50 and sent about 15 % of visitors to B (Framer Analytics, 05-06/11).
-  weights: { A: 3, B: 2 }
+  weights: { A: 1, B: 1 }
 };
 </script>
 <script>
